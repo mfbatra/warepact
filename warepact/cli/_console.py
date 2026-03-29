@@ -1,4 +1,4 @@
-"""Shared Rich console and output helpers for the DataPact CLI."""
+"""Shared Rich console and output helpers for the Warepact CLI."""
 
 from __future__ import annotations
 

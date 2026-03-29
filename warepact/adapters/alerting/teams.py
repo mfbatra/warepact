@@ -4,7 +4,7 @@ Required alert config keys:
   webhook_url — Teams incoming webhook URL
 
 Optional:
-  title       — card title override (default: "DataPact Contract Check")
+  title       — card title override (default: "Warepact Contract Check")
 """
 
 from __future__ import annotations
@@ -76,7 +76,7 @@ def _build_adaptive_card(
 ) -> dict[str, Any]:
     status_color = "good" if passed else "attention"
     status_text = "✅ PASSED" if passed else f"❌ FAILED — {len(failures)} issue(s)"
-    title = config.get("title", "DataPact Contract Check")
+    title = config.get("title", "Warepact Contract Check")
 
     body: list[dict[str, Any]] = [
         {

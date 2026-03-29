@@ -7,7 +7,7 @@ Required alert config keys (from contract YAML):
   webhook_url — Incoming Webhook URL (supports ${ENV_VAR} expansion)
 
 Optional:
-  username    — bot display name (default: "DataPact")
+  username    — bot display name (default: "Warepact")
   icon_emoji  — bot icon (default: ":white_check_mark:" / ":x:")
 """
 
@@ -82,7 +82,7 @@ class SlackChannel(AlertChannel):
     ) -> dict[str, Any]:
         status_emoji = ":white_check_mark:" if passed else ":x:"
         status_text = "PASSED" if passed else "FAILED"
-        username = config.get("username", "DataPact")
+        username = config.get("username", "Warepact")
 
         header = (
             f"{status_emoji} *Contract `{contract.name}` {status_text}*"

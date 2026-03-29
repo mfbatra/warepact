@@ -128,7 +128,7 @@ class TestSlackChannelSend:
         self.ch.send(_contract(), [], config={"webhook_url": "https://x"})
         req = mock_urlopen.call_args[0][0]
         body = json.loads(req.data.decode())
-        assert body["username"] == "DataPact"
+        assert body["username"] == "Warepact"
 
     @patch("urllib.request.urlopen")
     def test_content_type_is_json(self, mock_urlopen):

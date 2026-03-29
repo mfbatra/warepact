@@ -1,4 +1,4 @@
-"""DataPact abstract interfaces — the contracts that every plugin must honour."""
+"""Warepact abstract interfaces — the contracts that every plugin must honour."""
 
 from warepact.interfaces.alerting import AlertChannel
 from warepact.interfaces.store import ContractStore

@@ -19,20 +19,20 @@ from warepact.core.exceptions import ContractNotFoundError, ContractValidationEr
 
 # ── YAML 1.2-compatible loader ─────────────────────────────────────────────────
 # PyYAML defaults to YAML 1.1 which parses `on`/`off`/`yes`/`no` as booleans.
-# DataPact contracts use `on:` as a plain string key, so we restrict bool
+# Warepact contracts use `on:` as a plain string key, so we restrict bool
 # resolution to only `true` and `false` (YAML 1.2 behaviour).
 
-class _DataPactLoader(yaml.SafeLoader):
+class _WarepactLoader(yaml.SafeLoader):
     pass
 
 
 # Copy resolvers without the bool tag, then re-add a strict bool pattern
-_DataPactLoader.yaml_implicit_resolvers = {
+_WarepactLoader.yaml_implicit_resolvers = {
     key: [(tag, regexp) for tag, regexp in resolvers
           if tag != "tag:yaml.org,2002:bool"]
     for key, resolvers in yaml.SafeLoader.yaml_implicit_resolvers.items()
 }
-_DataPactLoader.add_implicit_resolver(
+_WarepactLoader.add_implicit_resolver(
     "tag:yaml.org,2002:bool",
     re.compile(r"^(?:true|false)$", re.IGNORECASE),
     list("tTfF"),
@@ -78,7 +78,7 @@ class YAMLParser:
             ContractValidationError: YAML is malformed or fails validation.
         """
         try:
-            data = yaml.load(yaml_text, Loader=_DataPactLoader)
+            data = yaml.load(yaml_text, Loader=_WarepactLoader)
         except yaml.YAMLError as exc:
             raise ContractValidationError(
                 f"Invalid YAML in '{source}': {exc}"

@@ -1,4 +1,4 @@
-"""PluginRegistry — the plug-and-play extension point for DataPact.
+"""PluginRegistry — the plug-and-play extension point for Warepact.
 
 Adapters self-register by decorating their class:
 

@@ -1,4 +1,4 @@
-"""DataPact built-in validators.
+"""Warepact built-in validators.
 
 Importing this package registers all validators with PluginRegistry.
 """

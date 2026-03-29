@@ -1,4 +1,4 @@
-"""Tests for the DataPact MCP server tools."""
+"""Tests for the Warepact MCP server tools."""
 
 from __future__ import annotations
 

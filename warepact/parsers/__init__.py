@@ -1,4 +1,4 @@
-"""DataPact contract parsers."""
+"""Warepact contract parsers."""
 
 from warepact.parsers.dbt_parser import DbtParser
 from warepact.parsers.json_parser import JSONParser

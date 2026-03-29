@@ -51,9 +51,9 @@ class PagerDutyChannel(AlertChannel):
             "dedup_key": f"warepact-{contract.name}",
             "payload": {
                 "summary": (
-                    f"DataPact: '{contract.name}' passed"
+                    f"Warepact: '{contract.name}' passed"
                     if not failures
-                    else f"DataPact: '{contract.name}' failed — "
+                    else f"Warepact: '{contract.name}' failed — "
                          f"{len(failures)} issue(s)"
                 ),
                 "source": source,

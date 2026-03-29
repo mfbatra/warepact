@@ -1,4 +1,4 @@
-"""DataPact core — Contract dataclass, PluginRegistry, and typed exceptions."""
+"""Warepact core — Contract dataclass, PluginRegistry, and typed exceptions."""
 
 from warepact.core.contract import (
     AlertSpec,
@@ -13,7 +13,7 @@ from warepact.core.exceptions import (
     ContractCheckError,
     ContractNotFoundError,
     ContractValidationError,
-    DataPactError,
+    WarepactError,
     UnknownAlertChannelError,
     UnknownWarehouseError,
     WarehouseConnectionError,
@@ -33,7 +33,7 @@ __all__ = [
     "ContractNotFoundError",
     "ContractValidationError",
     "CustomCheckSpec",
-    "DataPactError",
+    "WarepactError",
     "PluginRegistry",
     "ScheduleSpec",
     "SLASpec",

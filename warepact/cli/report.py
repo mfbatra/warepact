@@ -21,7 +21,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DataPact Health Report</title>
+<title>Warepact Health Report</title>
 <style>
   body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
          max-width: 960px; margin: 40px auto; padding: 0 20px; color: #1a1a2e; }}
@@ -42,7 +42,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 </style>
 </head>
 <body>
-<h1>DataPact Health Report</h1>
+<h1>Warepact Health Report</h1>
 <p class="ts">Generated: {generated_at}</p>
 
 <div class="summary">

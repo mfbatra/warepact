@@ -1,4 +1,4 @@
-"""DataPact MCP server — exposes contract tools to Claude, Cursor, and GPT.
+"""Warepact MCP server — exposes contract tools to Claude, Cursor, and GPT.
 
 Start it with:
     warepact mcp
@@ -24,7 +24,7 @@ from warepact.parsers.yaml_parser import YAMLParser
 mcp = FastMCP(
     "warepact",
     instructions=(
-        "DataPact MCP server. Use these tools to check data contract health, "
+        "Warepact MCP server. Use these tools to check data contract health, "
         "list contracts, explain breaches, and generate contract scaffolds."
     ),
 )
@@ -179,7 +179,7 @@ def get_contract_health() -> str:
     failed = total - passed
 
     lines = [
-        "DataPact Health Dashboard",
+        "Warepact Health Dashboard",
         f"{'─' * 30}",
         f"Total contracts : {total}",
         f"Passing         : {passed}",

@@ -43,7 +43,7 @@ class EmailChannel(AlertChannel):
         from_addr = config.get("from_addr", "warepact@localhost")
         failures = [r for r in results if not r.passed]
         subject = (
-            f"[DataPact] Contract '{contract.name}' "
+            f"[Warepact] Contract '{contract.name}' "
             + ("PASSED" if not failures else f"FAILED — {len(failures)} issue(s)")
         )
         body = _build_body(contract, results, failures)
@@ -74,7 +74,7 @@ class EmailChannel(AlertChannel):
 
 def _build_body(contract: Contract, results: list[ValidationResult], failures: list[ValidationResult]) -> str:
     lines = [
-        f"DataPact Contract Check: {contract.name}",
+        f"Warepact Contract Check: {contract.name}",
         f"Table: {contract.table}",
         "",
     ]

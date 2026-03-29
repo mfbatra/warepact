@@ -1,4 +1,4 @@
-"""DataPact CLI entry point."""
+"""Warepact CLI entry point."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def mcp_command(
     host: str = typer.Option("localhost", help="Host to bind to."),
     port: int = typer.Option(8765, help="Port to listen on."),
 ) -> None:
-    """Start the DataPact MCP server for Claude / Cursor integration."""
+    """Start the Warepact MCP server for Claude / Cursor integration."""
     from warepact.cli._console import console
     try:
         from warepact.mcp.server import run_server

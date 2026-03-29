@@ -1,4 +1,4 @@
-"""Tests for the DataPact CLI using Typer's CliRunner."""
+"""Tests for the Warepact CLI using Typer's CliRunner."""
 
 from __future__ import annotations
 

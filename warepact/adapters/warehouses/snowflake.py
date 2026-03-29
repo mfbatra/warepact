@@ -13,6 +13,7 @@ All keys are passed directly to snowflake.connector.connect().
 """
 
 from __future__ import annotations
+from typing import Any
 
 from datetime import datetime, timezone
 
@@ -26,7 +27,7 @@ class SnowflakeAdapter(WarehouseAdapter):
     """WarehouseAdapter implementation for Snowflake."""
 
     def __init__(self) -> None:
-        self._conn = None
+        self._conn: Any = None
 
     # ── Connection ─────────────────────────────────────────────────────────────
 

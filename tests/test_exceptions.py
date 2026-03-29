@@ -6,7 +6,7 @@ from warepact.core.exceptions import (
     ContractCheckError,
     ContractNotFoundError,
     ContractValidationError,
-    DataPactError,
+    WarepactError,
     UnknownAlertChannelError,
     UnknownWarehouseError,
     WarehouseConnectionError,
@@ -26,7 +26,7 @@ ALL_EXCEPTIONS = [
 class TestExceptionHierarchy:
     @pytest.mark.parametrize("exc_class", ALL_EXCEPTIONS)
     def test_inherits_from_warepact_error(self, exc_class):
-        assert issubclass(exc_class, DataPactError)
+        assert issubclass(exc_class, WarepactError)
 
     @pytest.mark.parametrize("exc_class", ALL_EXCEPTIONS)
     def test_inherits_from_base_exception(self, exc_class):
@@ -34,7 +34,7 @@ class TestExceptionHierarchy:
 
     @pytest.mark.parametrize("exc_class", ALL_EXCEPTIONS)
     def test_can_be_raised_and_caught_as_warepact_error(self, exc_class):
-        with pytest.raises(DataPactError):
+        with pytest.raises(WarepactError):
             raise exc_class("test message")
 
     @pytest.mark.parametrize("exc_class", ALL_EXCEPTIONS)
