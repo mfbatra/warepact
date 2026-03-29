@@ -89,6 +89,7 @@ module = [
     "mcp.*",
     "databricks.*",
     "anthropic",
+    "duckdb",
 ]
 ignore_missing_imports = true
 
