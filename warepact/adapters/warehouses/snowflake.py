@@ -74,17 +74,43 @@ class SnowflakeAdapter(WarehouseAdapter):
         return int(row[0]) if row else 0
 
     def get_last_updated(self, table: str) -> datetime:
-        """Query INFORMATION_SCHEMA for the table's last-altered timestamp."""
+        """Return the timestamp of the most recent data load for the table.
+
+        Queries INFORMATION_SCHEMA.LOAD_HISTORY for the last COPY INTO
+        operation, which tracks actual data ingestion time. Falls back to
+        LAST_ALTERED (DDL schema-change time) when no load history exists.
+
+        Note: LAST_ALTERED only reflects schema changes, not DML (INSERT/
+        UPDATE/MERGE). Tables populated without COPY INTO will show the last
+        schema change time as a fallback, which may not reflect data freshness.
+        """
         table_name = table.split(".")[-1].upper()
+
+        # Primary: LOAD_HISTORY tracks COPY INTO completions (actual data loads)
+        try:
+            cur = self._cursor
+            cur.execute(
+                "SELECT MAX(LAST_LOAD_TIME) FROM INFORMATION_SCHEMA.LOAD_HISTORY "
+                f"WHERE TABLE_NAME = '{table_name}'"
+            )
+            row = cur.fetchone()
+            if row and row[0]:
+                ts: datetime = row[0]
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+                return ts
+        except Exception:
+            pass
+
+        # Fallback: LAST_ALTERED reflects DDL changes only, not DML
         cur = self._cursor
-        cur.execute(f"""
-            SELECT MAX(LAST_ALTERED)
-            FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_NAME = '{table_name}'
-        """)
+        cur.execute(
+            "SELECT MAX(LAST_ALTERED) FROM INFORMATION_SCHEMA.TABLES "
+            f"WHERE TABLE_NAME = '{table_name}'"
+        )
         row = cur.fetchone()
         if row and row[0]:
-            ts: datetime = row[0]
+            ts = row[0]
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=timezone.utc)
             return ts

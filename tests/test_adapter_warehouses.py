@@ -1,4 +1,4 @@
-"""Unit tests for BigQuery, Redshift, and Postgres warehouse adapters.
+"""Unit tests for Snowflake, BigQuery, Redshift, and Postgres warehouse adapters.
 
 All external connectors are mocked — no real credentials needed.
 """
@@ -10,6 +10,73 @@ from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 import pytest
+
+
+# ── Snowflake ─────────────────────────────────────────────────────────────────
+
+class TestSnowflakeAdapter:
+    @pytest.fixture(autouse=True)
+    def mock_snowflake(self):
+        sf_mock = MagicMock()
+        with patch.dict(sys.modules, {
+            "snowflake": MagicMock(),
+            "snowflake.connector": sf_mock,
+        }):
+            yield
+
+    def _make_adapter(self):
+        from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
+        adapter = SnowflakeAdapter()
+        adapter._conn = MagicMock()
+        return adapter
+
+    def test_get_last_updated_uses_load_history(self):
+        """LOAD_HISTORY result is returned when a recent load exists."""
+        adapter = self._make_adapter()
+        ts = datetime(2024, 6, 1, 8, 0, 0, tzinfo=timezone.utc)
+        cur = MagicMock()
+        cur.fetchone.return_value = (ts,)
+        adapter._conn.cursor.return_value = cur
+        result = adapter.get_last_updated("analytics.core.orders")
+        assert result == ts
+
+    def test_get_last_updated_falls_back_to_last_altered_when_no_load_history(self):
+        """When LOAD_HISTORY has no rows, LAST_ALTERED is used."""
+        adapter = self._make_adapter()
+        fallback_ts = datetime(2024, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        cur = MagicMock()
+        # First fetchone (LOAD_HISTORY) → no result; second (LAST_ALTERED) → fallback
+        cur.fetchone.side_effect = [(None,), (fallback_ts,)]
+        adapter._conn.cursor.return_value = cur
+        result = adapter.get_last_updated("analytics.core.orders")
+        assert result == fallback_ts
+
+    def test_get_last_updated_falls_back_when_load_history_raises(self):
+        """When LOAD_HISTORY query fails (e.g. permissions), LAST_ALTERED is used."""
+        adapter = self._make_adapter()
+        fallback_ts = datetime(2024, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        cur = MagicMock()
+        cur.execute.side_effect = [Exception("Insufficient privileges"), None]
+        cur.fetchone.return_value = (fallback_ts,)
+        adapter._conn.cursor.return_value = cur
+        result = adapter.get_last_updated("orders")
+        assert result == fallback_ts
+
+    def test_get_last_updated_adds_utc_to_naive_datetime(self):
+        adapter = self._make_adapter()
+        naive_ts = datetime(2024, 6, 1, 8, 0, 0)
+        cur = MagicMock()
+        cur.fetchone.return_value = (naive_ts,)
+        adapter._conn.cursor.return_value = cur
+        result = adapter.get_last_updated("orders")
+        assert result.tzinfo == timezone.utc
+
+    def test_not_connected_raises(self):
+        from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
+        adapter = SnowflakeAdapter()
+        with pytest.raises(WarehouseConnectionError, match="Not connected"):
+            adapter.get_schema("orders")
 
 
 # ── BigQuery ──────────────────────────────────────────────────────────────────
