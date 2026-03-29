@@ -7,7 +7,7 @@ packages = ["warepact"]
 
 [project]
 name = "warepact"
-version = "0.1.1"
+version = "0.1.2"
 description = "The dbt of data contracts — define, enforce, and evolve data contracts"
 readme = "README.md"
 requires-python = ">=3.12"
