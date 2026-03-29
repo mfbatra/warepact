@@ -83,12 +83,18 @@ class DuckDBAdapter(WarehouseAdapter):
             result = self._connection.execute(
                 "SELECT database_name, path FROM duckdb_databases()"
             ).fetchall()
-            for name, path in result:
+            for _name, path in result:
                 if path and path != "" and path != ":memory:" and os.path.isfile(path):
                     mtime = os.path.getmtime(path)
                     return datetime.fromtimestamp(mtime, tz=timezone.utc)
-        except Exception:
-            pass
+        except Exception as exc:
+            import warnings
+            warnings.warn(
+                f"Could not determine last_updated for '{table}': {exc}. "
+                "Falling back to current time — freshness checks may be unreliable.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return datetime.now(tz=timezone.utc)
 
     def run_query(self, sql: str) -> list[dict]:

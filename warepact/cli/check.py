@@ -114,12 +114,14 @@ def _check_all(
         raise typer.Exit(code=0)
 
     results = []
+    errors: list[str] = []
     for contract in contracts:
         contract.credentials = load_credentials(contract.warehouse)
         try:
             result = engine.check(contract)
         except ContractCheckError as exc:
             err_console.print(f"[red]{contract.name}:[/] {exc}")
+            errors.append(contract.name)
             continue
         results.append(result)
         if not output_json:
@@ -130,15 +132,20 @@ def _check_all(
         console.print(json.dumps([r.to_dict() for r in results], indent=2))
 
     failed = [r for r in results if not r.passed]
+    total = len(results) + len(errors)
+    parts = []
     if failed:
-        console.print(
-            f"\n[bold red]{len(failed)}/{len(results)} contract(s) failed.[/]"
-        )
+        parts.append(f"[bold red]{len(failed)} failed[/]")
+    if errors:
+        parts.append(f"[bold red]{len(errors)} errored[/]")
+    if len(results) - len(failed) > 0:
+        parts.append(f"[bold green]{len(results) - len(failed)} passed[/]")
+
+    console.print(f"\n{', '.join(parts)} out of {total} contract(s).")
+
+    if failed or errors:
         raise typer.Exit(code=1)
     else:
-        console.print(
-            f"\n[bold green]All {len(results)} contract(s) passed.[/]"
-        )
         raise typer.Exit(code=0)
 
 
