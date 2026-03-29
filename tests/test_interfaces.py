@@ -1,4 +1,4 @@
-"""Tests for datapact/interfaces/ — verify every abstract interface is correct."""
+"""Tests for warepact/interfaces/ — verify every abstract interface is correct."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import pytest
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
-from datapact.interfaces.warehouse import (
+from warepact.interfaces.warehouse import (
     IFreshnessCheckable,
     INullCheckable,
     IQueryable,
@@ -14,9 +14,9 @@ from datapact.interfaces.warehouse import (
     IVolumeCheckable,
     WarehouseAdapter,
 )
-from datapact.interfaces.validator import ValidationResult, Validator
-from datapact.interfaces.alerting import AlertChannel
-from datapact.interfaces.store import ContractStore
+from warepact.interfaces.validator import ValidationResult, Validator
+from warepact.interfaces.alerting import AlertChannel
+from warepact.interfaces.store import ContractStore
 
 
 # ── Concrete stubs (minimal implementations used only in this test module) ─────

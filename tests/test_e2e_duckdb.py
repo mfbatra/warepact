@@ -13,12 +13,12 @@ import textwrap
 import pytest
 
 # Force registration of all built-in validators and adapters
-import datapact.validators  # noqa: F401
-from datapact.adapters.warehouses.duckdb import DuckDBAdapter
-from datapact.core.contract import Contract
-from datapact.core.engine import ContractEngine
-from datapact.core.registry import PluginRegistry
-from datapact.parsers.yaml_parser import YAMLParser
+import warepact.validators  # noqa: F401
+from warepact.adapters.warehouses.duckdb import DuckDBAdapter
+from warepact.core.contract import Contract
+from warepact.core.engine import ContractEngine
+from warepact.core.registry import PluginRegistry
+from warepact.parsers.yaml_parser import YAMLParser
 
 
 # ── Shared fixtures ────────────────────────────────────────────────────────────
@@ -74,27 +74,27 @@ def adapter(duckdb_conn):
 def reset_registry():
     PluginRegistry._reset()
     # Re-register validators explicitly (re-import is a no-op after first import)
-    from datapact.validators.schema import SchemaValidator
-    from datapact.validators.freshness import FreshnessValidator
-    from datapact.validators.volume import VolumeValidator
-    from datapact.validators.nulls import NullsValidator
-    from datapact.validators.custom_sql import CustomSQLValidator
-    from datapact.validators.distribution import DistributionValidator
+    from warepact.validators.schema import SchemaValidator
+    from warepact.validators.freshness import FreshnessValidator
+    from warepact.validators.volume import VolumeValidator
+    from warepact.validators.nulls import NullsValidator
+    from warepact.validators.custom_sql import CustomSQLValidator
+    from warepact.validators.distribution import DistributionValidator
     for v in (SchemaValidator, FreshnessValidator, VolumeValidator,
               NullsValidator, CustomSQLValidator, DistributionValidator):
         PluginRegistry.register_validator(v)
     # Re-register warehouse adapters
-    from datapact.adapters.warehouses.bigquery import BigQueryAdapter
-    from datapact.adapters.warehouses.redshift import RedshiftAdapter
-    from datapact.adapters.warehouses.postgres import PostgresAdapter
+    from warepact.adapters.warehouses.bigquery import BigQueryAdapter
+    from warepact.adapters.warehouses.redshift import RedshiftAdapter
+    from warepact.adapters.warehouses.postgres import PostgresAdapter
     PluginRegistry.register_warehouse("duckdb")(DuckDBAdapter)
     PluginRegistry.register_warehouse("bigquery")(BigQueryAdapter)
     PluginRegistry.register_warehouse("redshift")(RedshiftAdapter)
     PluginRegistry.register_warehouse("postgres")(PostgresAdapter)
     # Re-register alert channels
-    from datapact.adapters.alerting.email import EmailChannel
-    from datapact.adapters.alerting.pagerduty import PagerDutyChannel
-    from datapact.adapters.alerting.webhook import WebhookChannel
+    from warepact.adapters.alerting.email import EmailChannel
+    from warepact.adapters.alerting.pagerduty import PagerDutyChannel
+    from warepact.adapters.alerting.webhook import WebhookChannel
     PluginRegistry.register_alert_channel("email")(EmailChannel)
     PluginRegistry.register_alert_channel("pagerduty")(PagerDutyChannel)
     PluginRegistry.register_alert_channel("webhook")(WebhookChannel)
@@ -307,7 +307,7 @@ class TestE2ECheckResult:
 
 class TestE2EFilesystemStore:
     def test_save_and_reload_roundtrip(self, tmp_path, adapter):
-        from datapact.adapters.stores.filesystem import FilesystemContractStore
+        from warepact.adapters.stores.filesystem import FilesystemContractStore
 
         store = FilesystemContractStore(root=tmp_path)
         contract = _contract(textwrap.dedent("""\
@@ -330,8 +330,8 @@ class TestE2EFilesystemStore:
         assert not store.exists("orders")
 
     def test_load_missing_raises(self, tmp_path):
-        from datapact.adapters.stores.filesystem import FilesystemContractStore
-        from datapact.core.exceptions import ContractNotFoundError
+        from warepact.adapters.stores.filesystem import FilesystemContractStore
+        from warepact.core.exceptions import ContractNotFoundError
 
         store = FilesystemContractStore(root=tmp_path)
         with pytest.raises(ContractNotFoundError):
@@ -341,7 +341,7 @@ class TestE2EFilesystemStore:
 class TestE2EDbtParser:
     def test_parse_manifest(self, tmp_path):
         import json
-        from datapact.parsers.dbt_parser import DbtParser
+        from warepact.parsers.dbt_parser import DbtParser
 
         manifest = {
             "nodes": {
@@ -370,7 +370,7 @@ class TestE2EDbtParser:
 
     def test_write_contracts(self, tmp_path):
         import json
-        from datapact.parsers.dbt_parser import DbtParser
+        from warepact.parsers.dbt_parser import DbtParser
 
         manifest = {
             "nodes": {
@@ -397,7 +397,7 @@ class TestE2EDbtParser:
 class TestE2EJSONParser:
     def test_parse_valid_json(self, tmp_path):
         import json
-        from datapact.parsers.json_parser import JSONParser
+        from warepact.parsers.json_parser import JSONParser
 
         data = {"name": "orders", "warehouse": "duckdb", "table": "raw.orders"}
         f = tmp_path / "orders.contract.json"
@@ -408,8 +408,8 @@ class TestE2EJSONParser:
         assert contract.name == "orders"
 
     def test_invalid_json_raises(self):
-        from datapact.parsers.json_parser import JSONParser
-        from datapact.core.exceptions import ContractValidationError
+        from warepact.parsers.json_parser import JSONParser
+        from warepact.core.exceptions import ContractValidationError
 
         parser = JSONParser()
         with pytest.raises(ContractValidationError):
@@ -420,30 +420,30 @@ class TestE2EAdditionalAdapters:
     """Verify BigQuery/Redshift/Postgres/Email/PagerDuty/Webhook register correctly."""
 
     def test_bigquery_registered(self):
-        import datapact.adapters.warehouses.bigquery  # noqa: F401
+        import warepact.adapters.warehouses.bigquery  # noqa: F401
         assert "bigquery" in PluginRegistry.list_warehouses()
 
     def test_redshift_registered(self):
-        import datapact.adapters.warehouses.redshift  # noqa: F401
+        import warepact.adapters.warehouses.redshift  # noqa: F401
         assert "redshift" in PluginRegistry.list_warehouses()
 
     def test_postgres_registered(self):
-        import datapact.adapters.warehouses.postgres  # noqa: F401
+        import warepact.adapters.warehouses.postgres  # noqa: F401
         assert "postgres" in PluginRegistry.list_warehouses()
 
     def test_email_registered(self):
-        import datapact.adapters.alerting.email  # noqa: F401
+        import warepact.adapters.alerting.email  # noqa: F401
         assert "email" in PluginRegistry.list_alert_channels()
 
     def test_pagerduty_registered(self):
-        import datapact.adapters.alerting.pagerduty  # noqa: F401
+        import warepact.adapters.alerting.pagerduty  # noqa: F401
         assert "pagerduty" in PluginRegistry.list_alert_channels()
 
     def test_webhook_registered(self):
-        import datapact.adapters.alerting.webhook  # noqa: F401
+        import warepact.adapters.alerting.webhook  # noqa: F401
         assert "webhook" in PluginRegistry.list_alert_channels()
 
     def test_distribution_validator_registered(self):
-        import datapact.validators.distribution  # noqa: F401
+        import warepact.validators.distribution  # noqa: F401
         names = {v().name for v in PluginRegistry.get_validators()}
         assert "distribution" in names

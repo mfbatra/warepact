@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import pytest
 
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.validator import ValidationResult
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.validator import ValidationResult
 
 
 # ── Registry / fixture setup ───────────────────────────────────────────────────
@@ -53,7 +53,7 @@ def contracts_dir(tmp_path):
 
 def _patch_contracts_dir(path: Path):
     """Patch the MCP server's _CONTRACTS_DIR to a temp path."""
-    import datapact.mcp.server as srv
+    import warepact.mcp.server as srv
     return patch.object(srv, "_CONTRACTS_DIR", path)
 
 
@@ -61,13 +61,13 @@ def _patch_contracts_dir(path: Path):
 
 class TestCheckContract:
     def test_passes_returns_passed(self, mock_warehouse, contracts_dir):
-        from datapact.mcp.server import check_contract
+        from warepact.mcp.server import check_contract
         with _patch_contracts_dir(contracts_dir):
             result = check_contract("orders")
         assert "PASSED" in result
 
     def test_missing_contract_returns_message(self, mock_warehouse, contracts_dir):
-        from datapact.mcp.server import check_contract
+        from warepact.mcp.server import check_contract
         with _patch_contracts_dir(contracts_dir):
             result = check_contract("nonexistent")
         assert "not found" in result.lower()
@@ -88,7 +88,7 @@ class TestCheckContract:
             def name(self): return "fail"
             def validate(self, c, a): return ValidationResult(passed=False, message="bad data")
 
-        from datapact.mcp.server import check_contract
+        from warepact.mcp.server import check_contract
         with _patch_contracts_dir(contracts_dir):
             result = check_contract("orders")
         assert "FAILED" in result
@@ -98,14 +98,14 @@ class TestCheckContract:
 
 class TestListContracts:
     def test_lists_contracts(self, mock_warehouse, contracts_dir):
-        from datapact.mcp.server import list_contracts
+        from warepact.mcp.server import list_contracts
         with _patch_contracts_dir(contracts_dir):
             result = list_contracts()
         assert "orders" in result
         assert "mock_wh" in result
 
     def test_empty_dir_returns_message(self, tmp_path):
-        from datapact.mcp.server import list_contracts
+        from warepact.mcp.server import list_contracts
         d = tmp_path / "empty"
         d.mkdir()
         with _patch_contracts_dir(d):
@@ -117,7 +117,7 @@ class TestListContracts:
 
 class TestExplainBreach:
     def test_no_breach_returns_passing_message(self, mock_warehouse, contracts_dir):
-        from datapact.mcp.server import explain_breach
+        from warepact.mcp.server import explain_breach
         with _patch_contracts_dir(contracts_dir):
             result = explain_breach("orders")
         assert "passing" in result.lower()
@@ -139,13 +139,13 @@ class TestExplainBreach:
             def validate(self, c, a):
                 return ValidationResult(passed=False, message="stale data detected")
 
-        from datapact.mcp.server import explain_breach
+        from warepact.mcp.server import explain_breach
         with _patch_contracts_dir(contracts_dir):
             result = explain_breach("orders")
         assert "stale data detected" in result
 
     def test_missing_contract_returns_message(self, mock_warehouse, contracts_dir):
-        from datapact.mcp.server import explain_breach
+        from warepact.mcp.server import explain_breach
         with _patch_contracts_dir(contracts_dir):
             result = explain_breach("ghost")
         assert "not found" in result.lower()
@@ -155,14 +155,14 @@ class TestExplainBreach:
 
 class TestGetContractHealth:
     def test_returns_dashboard(self, mock_warehouse, contracts_dir):
-        from datapact.mcp.server import get_contract_health
+        from warepact.mcp.server import get_contract_health
         with _patch_contracts_dir(contracts_dir):
             result = get_contract_health()
         assert "Total contracts" in result
         assert "orders" in result
 
     def test_empty_dir(self, tmp_path):
-        from datapact.mcp.server import get_contract_health
+        from warepact.mcp.server import get_contract_health
         d = tmp_path / "empty"
         d.mkdir()
         with _patch_contracts_dir(d):
@@ -174,13 +174,13 @@ class TestGetContractHealth:
 
 class TestSuggestContract:
     def test_returns_yaml_with_columns(self, mock_warehouse):
-        from datapact.mcp.server import suggest_contract
+        from warepact.mcp.server import suggest_contract
         result = suggest_contract("analytics.orders", warehouse="mock_wh")
         assert "name:" in result
         assert "schema:" in result or "id" in result
 
     def test_unknown_warehouse_returns_error(self):
-        from datapact.mcp.server import suggest_contract
+        from warepact.mcp.server import suggest_contract
         result = suggest_contract("t", warehouse="no_such_wh")
         assert "unknown" in result.lower() or "no adapter" in result.lower()
 
@@ -190,7 +190,7 @@ class TestSuggestContract:
 class TestMCPServerStartup:
     def test_mcp_app_has_expected_tools(self):
         """Verify all 5 tools are registered on the FastMCP app object."""
-        import datapact.mcp.server as srv
+        import warepact.mcp.server as srv
         # FastMCP exposes registered tools via ._tool_manager or similar internal;
         # the most portable check is that the tool functions exist as callables.
         expected = {"check_contract", "list_contracts", "explain_breach",
@@ -203,7 +203,7 @@ class TestMCPServerStartup:
 
     def test_run_server_calls_mcp_run(self):
         """run_server() must delegate to mcp.run() without error."""
-        import datapact.mcp.server as srv
+        import warepact.mcp.server as srv
         with patch.object(srv.mcp, "run") as mock_run:
             srv.run_server()
         mock_run.assert_called_once()
@@ -211,11 +211,11 @@ class TestMCPServerStartup:
     def test_mcp_object_is_fastmcp_instance(self):
         """The module-level mcp variable must be a FastMCP instance."""
         from fastmcp import FastMCP
-        import datapact.mcp.server as srv
+        import warepact.mcp.server as srv
         assert isinstance(srv.mcp, FastMCP)
 
     def test_server_module_loads_without_errors(self):
         """Importing the server module must not raise."""
         import importlib
-        mod = importlib.import_module("datapact.mcp.server")
+        mod = importlib.import_module("warepact.mcp.server")
         assert mod is not None

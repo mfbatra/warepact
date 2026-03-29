@@ -31,13 +31,13 @@ class TestBigQueryAdapter:
             yield
 
     def _make_adapter(self):
-        from datapact.adapters.warehouses.bigquery import BigQueryAdapter
+        from warepact.adapters.warehouses.bigquery import BigQueryAdapter
         adapter = BigQueryAdapter()
         adapter._client = MagicMock()
         return adapter
 
     def test_connect_without_creds_path(self):
-        from datapact.adapters.warehouses.bigquery import BigQueryAdapter
+        from warepact.adapters.warehouses.bigquery import BigQueryAdapter
         adapter = BigQueryAdapter()
         adapter.connect({"project": "my-project"})
         # After connect(), _client must be set (lazy import means we verify state not call)
@@ -45,10 +45,10 @@ class TestBigQueryAdapter:
         assert adapter._project == "my-project"
 
     def test_connect_missing_package_raises(self):
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.core.exceptions import WarehouseConnectionError
         with patch.dict(sys.modules, {"google.cloud.bigquery": None,
                                        "google.cloud": None, "google": None}):
-            from datapact.adapters.warehouses.bigquery import BigQueryAdapter
+            from warepact.adapters.warehouses.bigquery import BigQueryAdapter
             adapter = BigQueryAdapter()
             with pytest.raises(WarehouseConnectionError, match="google-cloud-bigquery"):
                 adapter.connect({})
@@ -101,8 +101,8 @@ class TestBigQueryAdapter:
         assert adapter.get_null_rates("orders", []) == {}
 
     def test_not_connected_raises(self):
-        from datapact.adapters.warehouses.bigquery import BigQueryAdapter
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.adapters.warehouses.bigquery import BigQueryAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
         adapter = BigQueryAdapter()
         with pytest.raises(WarehouseConnectionError, match="Not connected"):
             adapter.get_schema("orders")
@@ -118,7 +118,7 @@ class TestRedshiftAdapter:
             yield
 
     def _make_adapter(self):
-        from datapact.adapters.warehouses.redshift import RedshiftAdapter
+        from warepact.adapters.warehouses.redshift import RedshiftAdapter
         adapter = RedshiftAdapter()
         mock_conn = MagicMock()
         adapter._conn = mock_conn
@@ -126,7 +126,7 @@ class TestRedshiftAdapter:
         return adapter
 
     def test_connect_calls_connector(self):
-        from datapact.adapters.warehouses.redshift import RedshiftAdapter
+        from warepact.adapters.warehouses.redshift import RedshiftAdapter
         adapter = RedshiftAdapter()
         creds = {"host": "rs.example.com", "user": "admin", "password": "secret",
                  "database": "prod", "port": "5439"}
@@ -137,9 +137,9 @@ class TestRedshiftAdapter:
         )
 
     def test_connect_missing_package_raises(self):
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.core.exceptions import WarehouseConnectionError
         with patch.dict(sys.modules, {"redshift_connector": None}):
-            from datapact.adapters.warehouses.redshift import RedshiftAdapter
+            from warepact.adapters.warehouses.redshift import RedshiftAdapter
             adapter = RedshiftAdapter()
             with pytest.raises(WarehouseConnectionError, match="redshift-connector"):
                 adapter.connect({"host": "h", "user": "u", "password": "p"})
@@ -190,8 +190,8 @@ class TestRedshiftAdapter:
         assert adapter.get_null_rates("orders", []) == {}
 
     def test_not_connected_raises(self):
-        from datapact.adapters.warehouses.redshift import RedshiftAdapter
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.adapters.warehouses.redshift import RedshiftAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
         adapter = RedshiftAdapter()
         with pytest.raises(WarehouseConnectionError, match="Not connected"):
             adapter.get_row_count("orders")
@@ -220,7 +220,7 @@ class TestPostgresAdapter:
             yield
 
     def _make_adapter(self):
-        from datapact.adapters.warehouses.postgres import PostgresAdapter
+        from warepact.adapters.warehouses.postgres import PostgresAdapter
         adapter = PostgresAdapter()
         mock_conn = MagicMock()
         adapter._conn = mock_conn
@@ -228,7 +228,7 @@ class TestPostgresAdapter:
         return adapter
 
     def test_connect_calls_psycopg2(self):
-        from datapact.adapters.warehouses.postgres import PostgresAdapter
+        from warepact.adapters.warehouses.postgres import PostgresAdapter
         adapter = PostgresAdapter()
         creds = {"host": "pg.example.com", "port": "5432", "database": "mydb",
                  "user": "admin", "password": "secret"}
@@ -239,9 +239,9 @@ class TestPostgresAdapter:
         )
 
     def test_connect_missing_package_raises(self):
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.core.exceptions import WarehouseConnectionError
         with patch.dict(sys.modules, {"psycopg2": None, "psycopg2.extras": None}):
-            from datapact.adapters.warehouses.postgres import PostgresAdapter
+            from warepact.adapters.warehouses.postgres import PostgresAdapter
             adapter = PostgresAdapter()
             with pytest.raises(WarehouseConnectionError, match="psycopg2-binary"):
                 adapter.connect({})
@@ -313,8 +313,8 @@ class TestPostgresAdapter:
         assert adapter.get_null_rates("users", []) == {}
 
     def test_not_connected_raises(self):
-        from datapact.adapters.warehouses.postgres import PostgresAdapter
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.adapters.warehouses.postgres import PostgresAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
         adapter = PostgresAdapter()
         with pytest.raises(WarehouseConnectionError, match="Not connected"):
             adapter.get_schema("orders")
@@ -338,13 +338,13 @@ class TestDatabricksAdapter:
             yield
 
     def _make_adapter(self):
-        from datapact.adapters.warehouses.databricks import DatabricksAdapter
+        from warepact.adapters.warehouses.databricks import DatabricksAdapter
         adapter = DatabricksAdapter()
         adapter._conn = self.conn_mock
         return adapter
 
     def test_connect_calls_sql_connect(self):
-        from datapact.adapters.warehouses.databricks import DatabricksAdapter
+        from warepact.adapters.warehouses.databricks import DatabricksAdapter
         adapter = DatabricksAdapter()
         creds = {
             "server_hostname": "host.azuredatabricks.net",
@@ -359,15 +359,15 @@ class TestDatabricksAdapter:
         )
 
     def test_connect_missing_credentials_raises(self):
-        from datapact.adapters.warehouses.databricks import DatabricksAdapter
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.adapters.warehouses.databricks import DatabricksAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
         adapter = DatabricksAdapter()
         with pytest.raises(WarehouseConnectionError, match="require"):
             adapter.connect({"server_hostname": "host"})  # missing http_path + token
 
     def test_connect_missing_package_raises(self):
-        from datapact.adapters.warehouses.databricks import DatabricksAdapter
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.adapters.warehouses.databricks import DatabricksAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
         adapter = DatabricksAdapter()
         with patch.dict(sys.modules, {"databricks": None, "databricks.sql": None}):
             with pytest.raises((WarehouseConnectionError, ImportError)):
@@ -444,8 +444,8 @@ class TestDatabricksAdapter:
         assert adapter.get_null_rates("orders", []) == {}
 
     def test_not_connected_raises(self):
-        from datapact.adapters.warehouses.databricks import DatabricksAdapter
-        from datapact.core.exceptions import WarehouseConnectionError
+        from warepact.adapters.warehouses.databricks import DatabricksAdapter
+        from warepact.core.exceptions import WarehouseConnectionError
         adapter = DatabricksAdapter()
         with pytest.raises(WarehouseConnectionError, match="Not connected"):
             adapter.get_row_count("orders")

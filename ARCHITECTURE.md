@@ -1,4 +1,4 @@
-# DataPact — Full Technical Architecture
+# WarePact — Full Technical Architecture
 
 ## Vision
 The dbt of data contracts. Define, enforce, and evolve contracts between
@@ -28,7 +28,7 @@ transformation. Free. Forever. Open source.
 ## Directory Structure
 
 ```
-datapact/
+warepact/
 ├── core/
 │   ├── contract.py         # Contract dataclass — pure data, no logic
 │   ├── engine.py           # ContractEngine — orchestrates everything
@@ -72,11 +72,11 @@ datapact/
 │
 ├── cli/
 │   ├── main.py             # typer entry point
-│   ├── init.py             # datapact init
-│   ├── check.py            # datapact check
-│   ├── generate.py         # datapact generate (AI-assisted)
-│   ├── publish.py          # datapact publish
-│   └── watch.py            # datapact watch
+│   ├── init.py             # warepact init
+│   ├── check.py            # warepact check
+│   ├── generate.py         # warepact generate (AI-assisted)
+│   ├── publish.py          # warepact publish
+│   └── watch.py            # warepact watch
 │
 └── plugins/                # Community plugins drop in here
     └── README.md
@@ -379,7 +379,7 @@ pii: false
 # mcp/server.py
 from mcp import Server
 
-app = Server("datapact")
+app = Server("warepact")
 
 
 @app.tool()
@@ -419,15 +419,15 @@ async def suggest_contract(table_name: str) -> str:
 ## CLI
 
 ```bash
-datapact init                    # detect warehouse, scaffold contracts/
-datapact check orders            # check one contract
-datapact check --all             # check all contracts
-datapact watch                   # continuous monitoring mode
-datapact generate orders_raw     # AI-generate contract from table
-datapact publish orders          # publish to contract registry
-datapact diff orders v1 v2       # compare two versions
-datapact report                  # HTML health report
-datapact mcp                     # start MCP server for Claude/Cursor/GPT
+warepact init                    # detect warehouse, scaffold contracts/
+warepact check orders            # check one contract
+warepact check --all             # check all contracts
+warepact watch                   # continuous monitoring mode
+warepact generate orders_raw     # AI-generate contract from table
+warepact publish orders          # publish to contract registry
+warepact diff orders v1 v2       # compare two versions
+warepact report                  # HTML health report
+warepact mcp                     # start MCP server for Claude/Cursor/GPT
 ```
 
 ---
@@ -435,30 +435,30 @@ datapact mcp                     # start MCP server for Claude/Cursor/GPT
 ## How to Extend — Plug and Play
 
 ### Add a new warehouse
-1. Create `datapact/adapters/warehouses/databricks.py`
+1. Create `warepact/adapters/warehouses/databricks.py`
 2. Implement `WarehouseAdapter` (6 methods)
 3. Decorate: `@PluginRegistry.register_warehouse("databricks")`
 4. Done. Zero other files touched.
 
 ### Add a new alert channel
-1. Create `datapact/adapters/alerting/teams.py`
+1. Create `warepact/adapters/alerting/teams.py`
 2. Implement `AlertChannel` (1 method)
 3. Decorate: `@PluginRegistry.register_alert_channel("teams")`
 4. Done.
 
 ### Add a new validator
-1. Create `datapact/validators/distribution.py`
+1. Create `warepact/validators/distribution.py`
 2. Implement `Validator` (1 method)
 3. Decorate: `@PluginRegistry.register_validator`
 4. Automatically included in all future contract checks.
 
 ### Community plugin packages
 ```bash
-pip install datapact-databricks          # auto-registers on import
-pip install datapact-teams
-pip install datapact-great-expectations
-pip install datapact-dbt                 # reads dbt manifest, generates contracts
-pip install datapact-airflow             # Airflow operator for contract checks
+pip install warepact-databricks          # auto-registers on import
+pip install warepact-teams
+pip install warepact-great-expectations
+pip install warepact-dbt                 # reads dbt manifest, generates contracts
+pip install warepact-airflow             # Airflow operator for contract checks
 ```
 Exact same model as dbt packages. Community builds the long tail.
 
@@ -482,9 +482,9 @@ Exact same model as dbt packages. Community builds the long tail.
 ## Installation
 
 ```bash
-pip install datapact
-pip install datapact[snowflake]
-pip install datapact[bigquery]
-pip install datapact[duckdb]
-pip install datapact[all]
+pip install warepact
+pip install warepact[snowflake]
+pip install warepact[bigquery]
+pip install warepact[duckdb]
+pip install warepact[all]
 ```

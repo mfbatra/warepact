@@ -10,22 +10,22 @@ import pytest
 from datetime import datetime, timezone, timedelta
 from unittest.mock import MagicMock
 
-from datapact.core.contract import Contract, SLASpec
-from datapact.core.registry import PluginRegistry
-from datapact.validators.custom_sql import CustomSQLValidator as _CSV
-from datapact.validators.distribution import DistributionValidator as _DV
-from datapact.validators.freshness import FreshnessValidator as _FV
-from datapact.validators.nulls import NullsValidator as _NV
-from datapact.validators.schedule import ScheduleValidator as _ScV
-from datapact.validators.schema import SchemaValidator as _SV
-from datapact.validators.volume import VolumeValidator as _VV
-from datapact.validators.schema import SchemaValidator
-from datapact.validators.freshness import FreshnessValidator
-from datapact.validators.volume import VolumeValidator
-from datapact.validators.nulls import NullsValidator
-from datapact.validators.custom_sql import CustomSQLValidator, _extract_scalar
-from datapact.validators.distribution import DistributionValidator
-from datapact.validators.schedule import ScheduleValidator, _parse_expected_by
+from warepact.core.contract import Contract, SLASpec
+from warepact.core.registry import PluginRegistry
+from warepact.validators.custom_sql import CustomSQLValidator as _CSV
+from warepact.validators.distribution import DistributionValidator as _DV
+from warepact.validators.freshness import FreshnessValidator as _FV
+from warepact.validators.nulls import NullsValidator as _NV
+from warepact.validators.schedule import ScheduleValidator as _ScV
+from warepact.validators.schema import SchemaValidator as _SV
+from warepact.validators.volume import VolumeValidator as _VV
+from warepact.validators.schema import SchemaValidator
+from warepact.validators.freshness import FreshnessValidator
+from warepact.validators.volume import VolumeValidator
+from warepact.validators.nulls import NullsValidator
+from warepact.validators.custom_sql import CustomSQLValidator, _extract_scalar
+from warepact.validators.distribution import DistributionValidator
+from warepact.validators.schedule import ScheduleValidator, _parse_expected_by
 
 
 # Re-register validators in case test_registry.py's autouse fixture cleared them.
@@ -691,7 +691,7 @@ class TestDistributionValidator:
 class TestValidatorRegistration:
     def test_all_validators_registered(self):
         # Import validators package to trigger registration
-        import datapact.validators  # noqa: F401
+        import warepact.validators  # noqa: F401
         registered_names = {v().name for v in PluginRegistry.get_validators()}
         assert {"schema", "freshness", "volume", "nulls", "custom_sql",
                 "distribution", "schedule"}.issubset(registered_names)

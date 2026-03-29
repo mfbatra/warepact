@@ -5,11 +5,11 @@ from __future__ import annotations
 import pytest
 from unittest.mock import MagicMock
 
-from datapact.core.contract import Contract
-from datapact.core.engine import ContractCheckResult, ContractEngine, LLMExplainer
-from datapact.core.exceptions import ContractCheckError
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.validator import ValidationResult
+from warepact.core.contract import Contract
+from warepact.core.engine import ContractCheckResult, ContractEngine, LLMExplainer
+from warepact.core.exceptions import ContractCheckError
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.validator import ValidationResult
 
 
 # ── Fixtures ───────────────────────────────────────────────────────────────────

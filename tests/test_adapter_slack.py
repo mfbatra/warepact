@@ -6,10 +6,10 @@ import json
 from unittest.mock import MagicMock, patch
 
 
-from datapact.adapters.alerting.slack import SlackChannel
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.alerting import AlertChannel
-from datapact.interfaces.validator import ValidationResult
+from warepact.adapters.alerting.slack import SlackChannel
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.alerting import AlertChannel
+from warepact.interfaces.validator import ValidationResult
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ class TestSlackChannelInterface:
 
     def test_registered_in_registry(self):
         # Force import to trigger registration
-        from datapact.adapters.alerting import slack  # noqa: F401
+        from warepact.adapters.alerting import slack  # noqa: F401
         assert "slack" in PluginRegistry.list_alert_channels()
 
 
@@ -123,7 +123,7 @@ class TestSlackChannelSend:
         assert body["username"] == "MyBot"
 
     @patch("urllib.request.urlopen")
-    def test_default_username_is_datapact(self, mock_urlopen):
+    def test_default_username_is_warepact(self, mock_urlopen):
         mock_urlopen.return_value = _mock_response(200)
         self.ch.send(_contract(), [], config={"webhook_url": "https://x"})
         req = mock_urlopen.call_args[0][0]

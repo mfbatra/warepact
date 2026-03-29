@@ -19,9 +19,9 @@ jobs:
       - name: Install dev dependencies
         run: pip install -e ".[dev]"
       - name: Ruff
-        run: ruff check datapact/
+        run: ruff check warepact/
       - name: Mypy
-        run: mypy datapact/
+        run: mypy warepact/
 
   test:
     name: Test
@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev,duckdb]"
       - name: Pytest
-        run: pytest --cov=datapact --cov-report=term-missing -q
+        run: pytest --cov=warepact --cov-report=term-missing -q
 
   release:
     name: Publish to PyPI

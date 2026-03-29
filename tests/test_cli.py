@@ -9,9 +9,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from datapact.cli.main import app
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.validator import ValidationResult
+from warepact.cli.main import app
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.validator import ValidationResult
 
 
 runner = CliRunner()
@@ -57,7 +57,7 @@ def mock_warehouse(clean_registry):
         def get_null_rates(self, t, cols): return {c: 0.0 for c in cols}
 
 
-# ── datapact --help ────────────────────────────────────────────────────────────
+# ── warepact --help ────────────────────────────────────────────────────────────
 
 def test_help():
     result = runner.invoke(app, ["--help"])
@@ -65,7 +65,7 @@ def test_help():
     assert "data contracts" in result.output.lower()
 
 
-# ── datapact init ──────────────────────────────────────────────────────────────
+# ── warepact init ──────────────────────────────────────────────────────────────
 
 class TestInitCommand:
     def test_creates_directory_and_file(self, tmp_path):
@@ -103,7 +103,7 @@ class TestInitCommand:
         assert "snowflake" in content
 
 
-# ── datapact check ─────────────────────────────────────────────────────────────
+# ── warepact check ─────────────────────────────────────────────────────────────
 
 class TestCheckCommand:
     def test_check_passes(self, contracts_dir, mock_warehouse):
@@ -176,7 +176,7 @@ class TestCheckCommand:
         assert result.exit_code == 1
 
 
-# ── datapact diff ──────────────────────────────────────────────────────────────
+# ── warepact diff ──────────────────────────────────────────────────────────────
 
 class TestDiffCommand:
     def test_diff_identical_contracts(self, tmp_path):
@@ -269,7 +269,7 @@ class TestDiffCommand:
         assert "type" in result.output.lower()
 
 
-# ── datapact publish ───────────────────────────────────────────────────────────
+# ── warepact publish ───────────────────────────────────────────────────────────
 
 class TestPublishCommand:
     def test_dry_run_passes(self, contracts_dir):
@@ -382,7 +382,7 @@ class TestPublishCommand:
         assert "orders" in result.output
 
 
-# ── datapact report ────────────────────────────────────────────────────────────
+# ── warepact report ────────────────────────────────────────────────────────────
 
 class TestReportCommand:
     def test_generates_html(self, contracts_dir, mock_warehouse, tmp_path):
@@ -410,7 +410,7 @@ class TestReportCommand:
         assert result.exit_code == 0
 
 
-# ── datapact watch ─────────────────────────────────────────────────────────────
+# ── warepact watch ─────────────────────────────────────────────────────────────
 
 class TestWatchCommand:
     """Watch runs an infinite loop — tests use KeyboardInterrupt to stop it."""
@@ -424,7 +424,7 @@ class TestWatchCommand:
             call_count[0] += 1
             raise KeyboardInterrupt
 
-        with patch("datapact.cli.watch.time.sleep", fake_sleep):
+        with patch("warepact.cli.watch.time.sleep", fake_sleep):
             result = runner.invoke(app, [
                 "watch",
                 "--dir", str(contracts_dir),
@@ -438,7 +438,7 @@ class TestWatchCommand:
         def fake_sleep(n):
             raise KeyboardInterrupt
 
-        with patch("datapact.cli.watch.time.sleep", fake_sleep):
+        with patch("warepact.cli.watch.time.sleep", fake_sleep):
             result = runner.invoke(app, [
                 "watch",
                 "--dir", str(contracts_dir),
@@ -451,7 +451,7 @@ class TestWatchCommand:
         def fake_sleep(n):
             raise KeyboardInterrupt
 
-        with patch("datapact.cli.watch.time.sleep", fake_sleep):
+        with patch("warepact.cli.watch.time.sleep", fake_sleep):
             result = runner.invoke(app, [
                 "watch",
                 "--dir", str(contracts_dir),
@@ -473,7 +473,7 @@ class TestWatchCommand:
         def fake_sleep(n):
             raise KeyboardInterrupt
 
-        with patch("datapact.cli.watch.time.sleep", fake_sleep):
+        with patch("warepact.cli.watch.time.sleep", fake_sleep):
             result = runner.invoke(app, [
                 "watch",
                 "--dir", str(contracts_dir),
@@ -484,16 +484,16 @@ class TestWatchCommand:
         assert result.exit_code == 0
 
     def test_seconds_until_next_returns_interval_without_cron(self):
-        from datapact.cli.watch import _seconds_until_next
+        from warepact.cli.watch import _seconds_until_next
         assert _seconds_until_next(None, 300) == 300
 
     def test_seconds_until_next_cron_returns_positive(self):
-        from datapact.cli.watch import _seconds_until_next
+        from warepact.cli.watch import _seconds_until_next
         secs = _seconds_until_next("0 * * * *", 300)
         assert 0 < secs <= 3600
 
 
-# ── datapact generate ──────────────────────────────────────────────────────────
+# ── warepact generate ──────────────────────────────────────────────────────────
 
 class TestGenerateCommand:
     @pytest.fixture
@@ -587,7 +587,7 @@ class TestGenerateCommand:
         assert (contracts_dir / "custom_name.contract.yaml").exists()
 
 
-# ── datapact init (env detection) ─────────────────────────────────────────────
+# ── warepact init (env detection) ─────────────────────────────────────────────
 
 class TestInitCommandEnvDetection:
     def test_init_scaffold_contains_default_warehouse(self, tmp_path, monkeypatch):
@@ -613,30 +613,30 @@ class TestInitCommandEnvDetection:
         assert "snowflake" in content
 
 
-# ── datapact mcp ───────────────────────────────────────────────────────────────
+# ── warepact mcp ───────────────────────────────────────────────────────────────
 
 class TestMcpCommand:
     def test_mcp_starts_server(self):
-        with patch("datapact.mcp.server.run_server") as mock_run:
+        with patch("warepact.mcp.server.run_server") as mock_run:
             result = runner.invoke(app, ["mcp"])
             assert result.exit_code == 0
             mock_run.assert_called_once()
 
     def test_mcp_passes_host_and_port(self):
-        with patch("datapact.mcp.server.run_server") as mock_run:
+        with patch("warepact.mcp.server.run_server") as mock_run:
             result = runner.invoke(app, ["mcp", "--host", "0.0.0.0", "--port", "9000"])
             assert result.exit_code == 0
             mock_run.assert_called_once_with(host="0.0.0.0", port=9000)
 
     def test_mcp_import_error_exits_nonzero(self):
         import sys
-        with patch.dict(sys.modules, {"datapact.mcp.server": None}):
+        with patch.dict(sys.modules, {"warepact.mcp.server": None}):
             result = runner.invoke(app, ["mcp"])
             assert result.exit_code == 1
 
     def test_mcp_import_error_prints_message(self):
         import sys
-        with patch.dict(sys.modules, {"datapact.mcp.server": None}):
+        with patch.dict(sys.modules, {"warepact.mcp.server": None}):
             result = runner.invoke(app, ["mcp"])
             assert "not installed" in result.output.lower() or result.exit_code == 1
 
@@ -646,7 +646,7 @@ class TestMcpCommand:
 class TestMainEntryPoint:
     def test_main_invokes_app(self):
         from unittest.mock import patch as _patch
-        with _patch("datapact.cli.main.app") as mock_app:
-            from datapact.cli.main import main
+        with _patch("warepact.cli.main.app") as mock_app:
+            from warepact.cli.main import main
             main()
             mock_app.assert_called_once()

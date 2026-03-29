@@ -8,8 +8,8 @@ from unittest.mock import patch
 
 import pytest
 
-from datapact.core.exceptions import ContractNotFoundError, ContractValidationError
-from datapact.parsers.json_parser import JSONParser
+from warepact.core.exceptions import ContractNotFoundError, ContractValidationError
+from warepact.parsers.json_parser import JSONParser
 
 
 VALID_CONTRACT = {

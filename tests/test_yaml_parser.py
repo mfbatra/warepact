@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from datapact.core.exceptions import ContractNotFoundError, ContractValidationError
-from datapact.parsers.yaml_parser import YAMLParser
+from warepact.core.exceptions import ContractNotFoundError, ContractValidationError
+from warepact.parsers.yaml_parser import YAMLParser
 
 
 VALID_YAML = textwrap.dedent("""\

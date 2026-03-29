@@ -5,10 +5,10 @@ from __future__ import annotations
 import pytest
 from datetime import datetime
 
-from datapact.adapters.warehouses.duckdb import DuckDBAdapter
-from datapact.core.exceptions import WarehouseConnectionError
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.warehouse import WarehouseAdapter
+from warepact.adapters.warehouses.duckdb import DuckDBAdapter
+from warepact.core.exceptions import WarehouseConnectionError
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.warehouse import WarehouseAdapter
 
 
 @pytest.fixture

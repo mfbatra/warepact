@@ -9,10 +9,10 @@ import json
 from unittest.mock import MagicMock, patch
 
 
-from datapact.adapters.alerting.email import EmailChannel
-from datapact.adapters.alerting.pagerduty import PagerDutyChannel
-from datapact.adapters.alerting.webhook import WebhookChannel
-from datapact.interfaces.validator import ValidationResult
+from warepact.adapters.alerting.email import EmailChannel
+from warepact.adapters.alerting.pagerduty import PagerDutyChannel
+from warepact.adapters.alerting.webhook import WebhookChannel
+from warepact.interfaces.validator import ValidationResult
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -180,7 +180,7 @@ class TestPagerDutyChannel:
 
         assert ok is True
         assert captured[0]["event_action"] == "trigger"
-        assert captured[0]["dedup_key"] == "datapact-orders"
+        assert captured[0]["dedup_key"] == "warepact-orders"
         assert "orders" in captured[0]["payload"]["summary"]
 
     def test_send_resolve_on_all_passed(self):
@@ -300,7 +300,7 @@ class TestWebhookChannel:
             ok = self.channel.send(
                 _contract(name="orders", table="raw.orders"),
                 [_result(passed=True), _result(passed=False, message="Too few rows")],
-                config={"url": "https://hooks.example.com/datapact"},
+                config={"url": "https://hooks.example.com/warepact"},
             )
 
         assert ok is True
@@ -327,7 +327,7 @@ class TestWebhookChannel:
             self.channel.send(
                 _contract(),
                 [_result()],
-                config={"url": "https://hooks.example.com/datapact", "method": "PUT"},
+                config={"url": "https://hooks.example.com/warepact", "method": "PUT"},
             )
 
         assert captured_methods[0] == "PUT"
@@ -349,7 +349,7 @@ class TestWebhookChannel:
                 _contract(),
                 [_result()],
                 config={
-                    "url": "https://hooks.example.com/datapact",
+                    "url": "https://hooks.example.com/warepact",
                     "headers": {"Authorization": "Bearer tok"},
                 },
             )
@@ -368,7 +368,7 @@ class TestWebhookChannel:
             ok = self.channel.send(
                 _contract(),
                 [_result()],
-                config={"url": "https://hooks.example.com/datapact"},
+                config={"url": "https://hooks.example.com/warepact"},
             )
         assert ok is False
 
@@ -377,7 +377,7 @@ class TestWebhookChannel:
             ok = self.channel.send(
                 _contract(),
                 [_result()],
-                config={"url": "https://hooks.example.com/datapact"},
+                config={"url": "https://hooks.example.com/warepact"},
             )
         assert ok is False
 
@@ -397,7 +397,7 @@ class TestWebhookChannel:
             self.channel.send(
                 _contract(),
                 [_result(passed=True), _result(passed=True)],
-                config={"url": "https://hooks.example.com/datapact"},
+                config={"url": "https://hooks.example.com/warepact"},
             )
 
         assert captured[0]["passed"] is True
@@ -408,7 +408,7 @@ class TestWebhookChannel:
 
 class TestTeamsChannel:
     def setup_method(self):
-        from datapact.adapters.alerting.teams import TeamsChannel
+        from warepact.adapters.alerting.teams import TeamsChannel
         self.channel = TeamsChannel()
 
     def test_channel_type(self):

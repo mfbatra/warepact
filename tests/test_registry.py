@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from datapact.core.exceptions import UnknownAlertChannelError, UnknownWarehouseError
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.alerting import AlertChannel
-from datapact.interfaces.validator import ValidationResult, Validator
-from datapact.interfaces.warehouse import WarehouseAdapter
+from warepact.core.exceptions import UnknownAlertChannelError, UnknownWarehouseError
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.alerting import AlertChannel
+from warepact.interfaces.validator import ValidationResult, Validator
+from warepact.interfaces.warehouse import WarehouseAdapter
 
 from datetime import datetime, timezone
 

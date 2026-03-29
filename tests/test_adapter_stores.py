@@ -11,8 +11,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
-from datapact.core.contract import Contract
-from datapact.core.exceptions import ContractNotFoundError
+from warepact.core.contract import Contract
+from warepact.core.exceptions import ContractNotFoundError
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ class TestS3ContractStore:
             yield
 
     def _make_store(self, prefix="contracts/"):
-        from datapact.adapters.stores.s3 import S3ContractStore
+        from warepact.adapters.stores.s3 import S3ContractStore
         store = S3ContractStore(bucket="my-bucket", prefix=prefix)
         store._client = self.s3_client
         return store
@@ -137,7 +137,7 @@ class TestS3ContractStore:
 
     def test_missing_boto3_raises_import_error(self):
         with patch.dict(sys.modules, {"boto3": None}):
-            from datapact.adapters.stores.s3 import S3ContractStore
+            from warepact.adapters.stores.s3 import S3ContractStore
             store = S3ContractStore(bucket="b")
             store._client = None  # force lazy init
             with pytest.raises(ImportError, match="boto3"):
@@ -148,7 +148,7 @@ class TestS3ContractStore:
         assert store._key("orders") == "team/contracts/orders.contract.yaml"
 
     def test_region_passed_to_boto3_client(self):
-        from datapact.adapters.stores.s3 import S3ContractStore
+        from warepact.adapters.stores.s3 import S3ContractStore
         store = S3ContractStore(bucket="b", region="us-west-2")
         store._s3()
         self.boto3_mock.client.assert_called_once_with(
@@ -183,7 +183,7 @@ class TestGCSContractStore:
             yield
 
     def _make_store(self, prefix="contracts/"):
-        from datapact.adapters.stores.gcs import GCSContractStore
+        from warepact.adapters.stores.gcs import GCSContractStore
         store = GCSContractStore(bucket="my-bucket", prefix=prefix)
         store._client = self.gcs_client
         mock_bucket = MagicMock()
@@ -268,7 +268,7 @@ class TestGCSContractStore:
             "google.cloud": None,
             "google": None,
         }):
-            from datapact.adapters.stores.gcs import GCSContractStore
+            from warepact.adapters.stores.gcs import GCSContractStore
             store = GCSContractStore(bucket="b")
             store._client = None
             store._bucket = None

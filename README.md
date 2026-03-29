@@ -1,9 +1,9 @@
-# DataPact
+# WarePact
 
 **The dbt of data contracts.** Define, enforce, and evolve contracts between data producers and consumers — as code, in CI, with zero vendor lock-in.
 
 ```bash
-pip install datapact[duckdb]
+pip install warepact[duckdb]
 ```
 
 ---
@@ -12,19 +12,19 @@ pip install datapact[duckdb]
 
 ```bash
 # Scaffold a contracts/ directory
-datapact init
+warepact init
 
 # Check a contract against your warehouse
-datapact check orders
+warepact check orders
 
 # Check all contracts
-datapact check --all
+warepact check --all
 
 # Generate a contract from a live table
-datapact generate analytics.core.orders --warehouse snowflake
+warepact generate analytics.core.orders --warehouse snowflake
 
 # Watch contracts continuously
-datapact watch --interval 300
+warepact watch --interval 300
 ```
 
 ---
@@ -71,18 +71,18 @@ custom_checks:
 
 | Warehouse  | Install extra          |
 |------------|------------------------|
-| DuckDB     | `pip install datapact[duckdb]`         |
-| Snowflake  | `pip install datapact[snowflake]`      |
-| BigQuery   | `pip install datapact[bigquery]`       |
-| Redshift   | `pip install datapact[redshift]`       |
-| Postgres   | `pip install datapact[postgres]`       |
-| Databricks | `pip install datapact[databricks]`     |
+| DuckDB     | `pip install warepact[duckdb]`         |
+| Snowflake  | `pip install warepact[snowflake]`      |
+| BigQuery   | `pip install warepact[bigquery]`       |
+| Redshift   | `pip install warepact[redshift]`       |
+| Postgres   | `pip install warepact[postgres]`       |
+| Databricks | `pip install warepact[databricks]`     |
 
 ---
 
 ## Configuration
 
-DataPact reads warehouse credentials from environment variables. No secrets belong in contract YAML files.
+WarePact reads warehouse credentials from environment variables. No secrets belong in contract YAML files.
 
 | Warehouse   | Required env vars |
 |-------------|-------------------|
@@ -93,7 +93,7 @@ DataPact reads warehouse credentials from environment variables. No secrets belo
 | `databricks`  | `DATABRICKS_HOST`, `DATABRICKS_TOKEN`, `DATABRICKS_HTTP_PATH` |
 | `duckdb`      | `DUCKDB_DATABASE` (path to `.duckdb` file, or `:memory:`) |
 
-`datapact init` automatically detects your warehouse from these env vars and prints the full list of required variables.
+`warepact init` automatically detects your warehouse from these env vars and prints the full list of required variables.
 
 ## Supported alert channels
 
@@ -101,6 +101,7 @@ DataPact reads warehouse credentials from environment variables. No secrets belo
 - **Email** — SMTP
 - **PagerDuty** — Events API v2
 - **Webhook** — Generic JSON POST/PUT
+- **Teams** — Adaptive Cards webhook
 
 ---
 
@@ -108,24 +109,24 @@ DataPact reads warehouse credentials from environment variables. No secrets belo
 
 | Command | Description |
 |---------|-------------|
-| `datapact init` | Scaffold `contracts/` with an example contract |
-| `datapact check <name>` | Check one contract |
-| `datapact check --all` | Check every contract in `contracts/` |
-| `datapact check --all --json` | Output results as JSON |
-| `datapact generate <table>` | Generate a contract YAML from a live table |
-| `datapact watch` | Continuously re-check on a schedule |
-| `datapact diff <name> <fileA> <fileB>` | Diff two contract versions |
-| `datapact report` | Generate an HTML health dashboard |
-| `datapact publish <name>` | Publish a contract to the registry |
-| `datapact mcp` | Start the MCP server for Claude/Cursor integration |
+| `warepact init` | Scaffold `contracts/` with an example contract |
+| `warepact check <name>` | Check one contract |
+| `warepact check --all` | Check every contract in `contracts/` |
+| `warepact check --all --json` | Output results as JSON |
+| `warepact generate <table>` | Generate a contract YAML from a live table |
+| `warepact watch` | Continuously re-check on a schedule |
+| `warepact diff <name> <fileA> <fileB>` | Diff two contract versions |
+| `warepact report` | Generate an HTML health dashboard |
+| `warepact publish <name>` | Publish a contract to the local registry |
+| `warepact mcp` | Start the MCP server for Claude/Cursor integration |
 
 ---
 
 ## Python API
 
 ```python
-from datapact import ContractEngine
-from datapact.parsers import YAMLParser
+from warepact import ContractEngine
+from warepact.parsers import YAMLParser
 
 parser = YAMLParser()
 contract = parser.parse_file("contracts/orders.contract.yaml")
@@ -148,7 +149,7 @@ print(result.to_human_readable())
 Start the MCP server and connect it to Claude or Cursor:
 
 ```bash
-datapact mcp
+warepact mcp
 ```
 
 Available tools: `check_contract`, `list_contracts`, `explain_breach`, `get_contract_health`, `suggest_contract`.
@@ -158,8 +159,8 @@ Available tools: `check_contract`, `list_contracts`, `explain_breach`, `get_cont
 ## Writing a custom adapter
 
 ```python
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.warehouse import WarehouseAdapter
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.warehouse import WarehouseAdapter
 
 @PluginRegistry.register_warehouse("mydb")
 class MyDBAdapter(WarehouseAdapter):
@@ -171,7 +172,7 @@ class MyDBAdapter(WarehouseAdapter):
     def get_null_rates(self, table: str, columns: list[str]) -> dict: ...
 ```
 
-Drop the file in `datapact/plugins/` or install it as a package — `PluginRegistry.autodiscover()` will pick it up automatically.
+Drop the file in `warepact/plugins/` or install it as a package — `PluginRegistry.autodiscover()` will pick it up automatically.
 
 ---
 

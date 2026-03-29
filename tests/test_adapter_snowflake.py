@@ -9,9 +9,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from datapact.core.exceptions import WarehouseConnectionError
-from datapact.core.registry import PluginRegistry
-from datapact.interfaces.warehouse import WarehouseAdapter
+from warepact.core.exceptions import WarehouseConnectionError
+from warepact.core.registry import PluginRegistry
+from warepact.interfaces.warehouse import WarehouseAdapter
 
 
 # ── Snowflake module mock helpers ──────────────────────────────────────────────
@@ -44,7 +44,7 @@ def sf():
     with _patch_snowflake() as (mock_connector, mock_conn):
         # Import inside the patch so the adapter sees the mock on connect()
         # Fresh class to avoid module-level caching
-        from datapact.adapters.warehouses.snowflake import SnowflakeAdapter
+        from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
         a = SnowflakeAdapter()
         a.connect({"account": "xy12345", "user": "u", "password": "p"})
         yield a, mock_connector, mock_conn
@@ -53,12 +53,12 @@ def sf():
 # ── Interface / registration ───────────────────────────────────────────────────
 
 def test_snowflake_is_warehouse_adapter():
-    from datapact.adapters.warehouses.snowflake import SnowflakeAdapter
+    from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
     assert issubclass(SnowflakeAdapter, WarehouseAdapter)
 
 
 def test_snowflake_registered():
-    from datapact.adapters.warehouses.snowflake import SnowflakeAdapter  # noqa: F401
+    from warepact.adapters.warehouses.snowflake import SnowflakeAdapter  # noqa: F401
     assert "snowflake" in PluginRegistry.list_warehouses()
 
 
@@ -66,7 +66,7 @@ def test_snowflake_registered():
 
 def test_connect_calls_sf_connector():
     with _patch_snowflake() as (mock_connector, _):
-        from datapact.adapters.warehouses.snowflake import SnowflakeAdapter
+        from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
         a = SnowflakeAdapter()
         a.connect({"account": "xy12345", "user": "u", "password": "p"})
         mock_connector.connect.assert_called_once()
@@ -75,14 +75,14 @@ def test_connect_calls_sf_connector():
 def test_connect_failure_raises():
     with _patch_snowflake() as (mock_connector, _):
         mock_connector.connect.side_effect = Exception("auth failed")
-        from datapact.adapters.warehouses.snowflake import SnowflakeAdapter
+        from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
         a = SnowflakeAdapter()
         with pytest.raises(WarehouseConnectionError, match="auth failed"):
             a.connect({"user": "x"})
 
 
 def test_not_connected_raises():
-    from datapact.adapters.warehouses.snowflake import SnowflakeAdapter
+    from warepact.adapters.warehouses.snowflake import SnowflakeAdapter
     a = SnowflakeAdapter()
     with pytest.raises(WarehouseConnectionError, match="connect"):
         a.get_row_count("orders")
