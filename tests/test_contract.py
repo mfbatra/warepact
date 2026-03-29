@@ -109,6 +109,60 @@ class TestAlertChannels:
             )
 
 
+class TestSQLInjectionPrevention:
+    def test_table_with_semicolon_rejects(self):
+        with pytest.raises(ValidationError, match="Table name"):
+            Contract(name="orders", warehouse="snowflake", table="orders; DROP TABLE users")
+
+    def test_table_with_single_quote_rejects(self):
+        with pytest.raises(ValidationError, match="Table name"):
+            Contract(name="orders", warehouse="snowflake", table="orders' OR '1'='1")
+
+    def test_table_with_comment_rejects(self):
+        with pytest.raises(ValidationError, match="Table name"):
+            Contract(name="orders", warehouse="snowflake", table="orders--injected")
+
+    def test_table_schema_qualified_ok(self):
+        c = Contract(name="orders", warehouse="snowflake", table="analytics.core.orders")
+        assert c.table == "analytics.core.orders"
+
+    def test_table_with_hyphen_ok(self):
+        c = Contract(name="orders", warehouse="bigquery", table="my-project.dataset.table")
+        assert c.table == "my-project.dataset.table"
+
+    def test_table_with_double_quotes_ok(self):
+        c = Contract(name="orders", warehouse="snowflake", table='"MySchema"."MyTable"')
+        assert c.table == '"MySchema"."MyTable"'
+
+    def test_column_with_semicolon_rejects(self):
+        with pytest.raises(ValidationError, match="Column name"):
+            Contract(
+                name="orders", warehouse="snowflake", table="orders",
+                schema=[{"column": "id; DROP TABLE users", "type": "integer"}],
+            )
+
+    def test_column_with_single_quote_rejects(self):
+        with pytest.raises(ValidationError, match="Column name"):
+            Contract(
+                name="orders", warehouse="snowflake", table="orders",
+                schema=[{"column": "col' OR '1'='1", "type": "string"}],
+            )
+
+    def test_column_normal_name_ok(self):
+        c = Contract(
+            name="orders", warehouse="snowflake", table="orders",
+            schema=[{"column": "order_id", "type": "integer"}],
+        )
+        assert c.columns[0].column == "order_id"
+
+    def test_column_with_backtick_quoting_ok(self):
+        c = Contract(
+            name="orders", warehouse="bigquery", table="t",
+            schema=[{"column": "`order-id`", "type": "integer"}],
+        )
+        assert c.columns[0].column == "`order-id`"
+
+
 class TestContractDefaults:
     def test_empty_collections(self):
         c = Contract(**MINIMAL)

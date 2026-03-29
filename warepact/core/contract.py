@@ -15,6 +15,10 @@ from pydantic import BaseModel, EmailStr, Field, field_validator, model_validato
 
 # ── Sub-models ─────────────────────────────────────────────────────────────────
 
+_SAFE_SQL_IDENTIFIER_RE = re.compile(r'^[-a-zA-Z0-9_`"]+$')
+_SAFE_SQL_TABLE_RE = re.compile(r'^[-a-zA-Z0-9_.`"]+$')
+
+
 class ColumnSpec(BaseModel):
     """Definition of a single expected column."""
 
@@ -25,6 +29,16 @@ class ColumnSpec(BaseModel):
     allowed_values: list[Any] | None = None
     min: float | None = None
     max: float | None = None
+
+    @field_validator("column")
+    @classmethod
+    def _column_must_be_safe(cls, v: str) -> str:
+        if not _SAFE_SQL_IDENTIFIER_RE.match(v) or "--" in v:
+            raise ValueError(
+                f"Column name '{v}' contains characters not allowed in SQL identifiers. "
+                "Use only letters, digits, underscores, hyphens, and standard quoting characters."
+            )
+        return v
 
 
 class SLASpec(BaseModel):
@@ -118,6 +132,16 @@ class Contract(BaseModel):
     credentials: dict[str, Any] = Field(default_factory=dict, exclude=True)
 
     model_config = {"populate_by_name": True}
+
+    @field_validator("table")
+    @classmethod
+    def _table_must_be_safe(cls, v: str) -> str:
+        if not _SAFE_SQL_TABLE_RE.match(v) or "--" in v:
+            raise ValueError(
+                f"Table name '{v}' contains characters not allowed in SQL identifiers. "
+                "Use only letters, digits, underscores, dots, hyphens, and standard quoting characters."
+            )
+        return v
 
     @field_validator("name")
     @classmethod
