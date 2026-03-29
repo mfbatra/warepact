@@ -10,12 +10,12 @@ import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-logger = logging.getLogger(__name__)
-
 from warepact.core.contract import Contract
 from warepact.core.exceptions import ContractCheckError
 from warepact.core.registry import PluginRegistry
 from warepact.interfaces.validator import ValidationResult
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     pass
