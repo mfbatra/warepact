@@ -6,8 +6,11 @@ Never imports a concrete adapter or alert channel directly.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
+
+logger = logging.getLogger(__name__)
 
 from warepact.core.contract import Contract
 from warepact.core.exceptions import ContractCheckError
@@ -119,8 +122,8 @@ class ContractEngine:
         if failures and self._llm is not None:
             try:
                 explanation = self._llm.explain(contract, failures)
-            except Exception:
-                pass  # LLM is best-effort — never block on it
+            except Exception as exc:
+                logger.warning("LLM explanation failed for contract '%s': %s", contract.name, exc)
 
         # ── Alert dispatch ──────────────────────────────────────────────────
         event = "recovery" if passed else "breach"
@@ -148,13 +151,14 @@ class ContractEngine:
             try:
                 channel = self._registry.get_alert_channel(alert_spec.channel)
             except Exception:
-                continue  # Unknown channel — skip, don't crash the check
+                logger.warning("Unknown alert channel '%s' on contract '%s' — skipping", alert_spec.channel, contract.name)
+                continue
 
             config = dict(alert_spec.model_extra or {})
             try:
                 channel.send(contract, failures if event == "breach" else results, config)
-            except Exception:
-                pass  # Alert failure must never surface to the caller
+            except Exception as exc:
+                logger.warning("Alert send failed for channel '%s' on contract '%s': %s", alert_spec.channel, contract.name, exc)
 
 
 # ── LLM explainer interface ────────────────────────────────────────────────────
